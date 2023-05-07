@@ -21,14 +21,14 @@ function getDefaultTarget() {
 
 // Affix
 export interface AffixProps {
-  /** 距离窗口顶部达到指定偏移量后触发 */
+  /** Triggered when the specified offset is reached from the top of the window */
   offsetTop?: number;
-  /** 距离窗口底部达到指定偏移量后触发 */
+  /** Triggered when the specified offset is reached from the bottom of the window */
   offsetBottom?: number;
   style?: React.CSSProperties;
-  /** 固定状态改变时触发的回调函数 */
+  /** Callback function triggered when fixed state changes */
   onChange?: (affixed?: boolean) => void;
-  /** 设置 Affix 需要监听其滚动事件的元素，值为一个返回对应 DOM 元素的函数 */
+  /** Set the element that Affix needs to listen to its scroll event, the value is a function that returns the corresponding DOM element */
   target?: () => Window | HTMLElement | null;
   prefixCls?: string;
   className?: string;
@@ -53,7 +53,7 @@ export interface AffixState {
   prevTarget: Window | HTMLElement | null;
 }
 
-class Affix extends React.Component<InternalAffixProps, AffixState> {
+class InternalAffix extends React.Component<InternalAffixProps, AffixState> {
   static contextType = ConfigContext;
 
   state: AffixState = {
@@ -164,41 +164,42 @@ class Affix extends React.Component<InternalAffixProps, AffixState> {
     const newState: Partial<AffixState> = {
       status: AffixStatus.None,
     };
-    const targetRect = getTargetRect(targetNode);
-    const placeholderReact = getTargetRect(this.placeholderNodeRef.current);
-    const fixedTop = getFixedTop(placeholderReact, targetRect, offsetTop);
-    const fixedBottom = getFixedBottom(placeholderReact, targetRect, offsetBottom);
+    const placeholderRect = getTargetRect(this.placeholderNodeRef.current);
 
     if (
-      placeholderReact.top === 0 &&
-      placeholderReact.left === 0 &&
-      placeholderReact.width === 0 &&
-      placeholderReact.height === 0
+      placeholderRect.top === 0 &&
+      placeholderRect.left === 0 &&
+      placeholderRect.width === 0 &&
+      placeholderRect.height === 0
     ) {
       return;
     }
+
+    const targetRect = getTargetRect(targetNode);
+    const fixedTop = getFixedTop(placeholderRect, targetRect, offsetTop);
+    const fixedBottom = getFixedBottom(placeholderRect, targetRect, offsetBottom);
 
     if (fixedTop !== undefined) {
       newState.affixStyle = {
         position: 'fixed',
         top: fixedTop,
-        width: placeholderReact.width,
-        height: placeholderReact.height,
+        width: placeholderRect.width,
+        height: placeholderRect.height,
       };
       newState.placeholderStyle = {
-        width: placeholderReact.width,
-        height: placeholderReact.height,
+        width: placeholderRect.width,
+        height: placeholderRect.height,
       };
     } else if (fixedBottom !== undefined) {
       newState.affixStyle = {
         position: 'fixed',
         bottom: fixedBottom,
-        width: placeholderReact.width,
-        height: placeholderReact.height,
+        width: placeholderRect.width,
+        height: placeholderRect.height,
       };
       newState.placeholderStyle = {
-        width: placeholderReact.width,
-        height: placeholderReact.height,
+        width: placeholderRect.width,
+        height: placeholderRect.height,
       };
     }
 
@@ -241,9 +242,9 @@ class Affix extends React.Component<InternalAffixProps, AffixState> {
       const targetNode = targetFunc();
       if (targetNode && this.placeholderNodeRef.current) {
         const targetRect = getTargetRect(targetNode);
-        const placeholderReact = getTargetRect(this.placeholderNodeRef.current);
-        const fixedTop = getFixedTop(placeholderReact, targetRect, offsetTop);
-        const fixedBottom = getFixedBottom(placeholderReact, targetRect, offsetBottom);
+        const placeholderRect = getTargetRect(this.placeholderNodeRef.current);
+        const fixedTop = getFixedTop(placeholderRect, targetRect, offsetTop);
+        const fixedBottom = getFixedBottom(placeholderRect, targetRect, offsetBottom);
 
         if (
           (fixedTop !== undefined && affixStyle.top === fixedTop) ||
@@ -293,9 +294,9 @@ class Affix extends React.Component<InternalAffixProps, AffixState> {
   }
 }
 // just use in test
-export type InternalAffixClass = Affix;
+export type InternalAffixClass = InternalAffix;
 
-const AffixFC = forwardRef<Affix, AffixProps>((props, ref) => {
+const Affix = forwardRef<InternalAffix, AffixProps>((props, ref) => {
   const { prefixCls: customizePrefixCls, rootClassName } = props;
   const { getPrefixCls } = useContext<ConfigConsumerProps>(ConfigContext);
   const affixPrefixCls = getPrefixCls('affix', customizePrefixCls);
@@ -308,11 +309,11 @@ const AffixFC = forwardRef<Affix, AffixProps>((props, ref) => {
     rootClassName: classNames(rootClassName, hashId),
   };
 
-  return wrapSSR(<Affix {...AffixProps} ref={ref} />);
+  return wrapSSR(<InternalAffix {...AffixProps} ref={ref} />);
 });
 
 if (process.env.NODE_ENV !== 'production') {
-  AffixFC.displayName = 'Affix';
+  Affix.displayName = 'Affix';
 }
 
-export default AffixFC;
+export default Affix;

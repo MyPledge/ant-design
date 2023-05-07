@@ -40,6 +40,7 @@ Use when you want to guide users through a product.
 | current | What is the current step | `number` | - |  |
 | scrollIntoViewOptions | support pass custom scrollIntoView options | `boolean \| ScrollIntoViewOptions` | `true` | 5.2.0 |
 | indicatorsRender | custom indicator | `(current: number, total: number) => ReactNode` | - | 5.2.0 |
+| zIndex | Tour's zIndex | number | 1001 | 5.3.0 |
 
 ### TourStep
 
@@ -57,3 +58,7 @@ Use when you want to guide users through a product.
 | nextButtonProps | Properties of the Next button | `{ children: ReactNode; onClick: Function }` | - |  |
 | prevButtonProps | Properties of the previous button | `{ children: ReactNode; onClick: Function }` | - |  |
 | scrollIntoViewOptions | support pass custom scrollIntoView options, the default follows the `scrollIntoViewOptions` property of Tour | `boolean \| ScrollIntoViewOptions` | `true` | 5.2.0 |
+
+## Design Token
+
+<ComponentTokenTable component="Tour"></ComponentTokenTable>
